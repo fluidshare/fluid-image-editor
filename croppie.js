@@ -633,7 +633,7 @@
             _onZoom.call(self, {
                 value: parseFloat(zoomer.value),
                 origin: new TransformOrigin(self.elements.preview),
-                viewportRect: self.elements.viewport.getBoundingClientRect(),
+                viewportRect: (self.options.captureFromBoundary ? self.elements.boundary.getBoundingClientRect() : self.elements.viewport.getBoundingClientRect()),
                 transform: Transform.parse(self.elements.preview)
             });
         }
@@ -672,7 +672,7 @@
     function _onZoom(ui) {
         var self = this,
             transform = ui ? ui.transform : Transform.parse(self.elements.preview),
-            vpRect = ui ? ui.viewportRect : self.elements.viewport.getBoundingClientRect(),
+            vpRect = ui ? ui.viewportRect : (self.options.captureFromBoundary ? self.elements.boundary.getBoundingClientRect() : self.elements.viewport.getBoundingClientRect()),
             origin = ui ? ui.origin : new TransformOrigin(self.elements.preview);
 
         function applyCss() {
@@ -854,7 +854,7 @@
 
                 transform = Transform.parse(self.elements.preview);
                 document.body.style[CSS_USERSELECT] = 'none';
-                vpRect = self.elements.viewport.getBoundingClientRect();
+                vpRect = (self.options.captureFromBoundary ? self.elements.boundary.getBoundingClientRect() : self.elements.viewport.getBoundingClientRect());
                 keyMove(movement);
             }
 
@@ -909,7 +909,7 @@
             window.addEventListener('mouseup', mouseUp);
             window.addEventListener('touchend', mouseUp);
             document.body.style[CSS_USERSELECT] = 'none';
-            vpRect = self.elements.viewport.getBoundingClientRect();
+            vpRect = (self.options.captureFromBoundary ? self.elements.boundary.getBoundingClientRect() : self.elements.viewport.getBoundingClientRect());
         }
 
         function mouseMove(ev) {
@@ -1078,8 +1078,13 @@
             minW,
             minH;
         if (self.options.enforceBoundary) {
-            minW = vpData.width / imgData.width;
-            minH = vpData.height / imgData.height;
+            if (self.options.captureFromBoundary) {
+                minW = boundaryData.width / imgData.width;
+                minH = boundaryData.height / imgData.height;
+            } else {
+                minW = vpData.width / imgData.width;
+                minH = vpData.height / imgData.height;
+            }
             minZoom = Math.max(minW, minH);
         }
 
@@ -1440,8 +1445,6 @@
         data.circle = circle;
         data.url = self.data.url;
         data.backgroundColor = backgroundColor;
-
-        console.log('data', data)
 
         prom = new Promise(function (resolve) {
             switch(resultType.toLowerCase())
