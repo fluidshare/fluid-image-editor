@@ -1,6 +1,6 @@
 {
   "name": "@fluidtruck/fluid-image-editor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An image editor based off of Croppie.js with a few custom additions",
   "main": "croppie.js",
   "devDependencies": {
